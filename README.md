@@ -52,8 +52,13 @@ docker run --rm -p 8000:8000 -p 9000:9000 -v </path/to/your/configs>:/data/conf 
 https://go-kratos.dev/en/docs/getting-started/start
 
 
-docker build -t kratos-k8s-job . 
+docker build -t bunyawat/kratos-k8s-job . 
 
-docker run --rm -p 8000:8000 -p 9000:9000 -v ./configs:/data/conf kratos-k8s-job
+docker run --rm -p 8000:8000 -p 9000:9000 -v ./configs:/data/conf bunyawat/kratos-k8s-job
 
+docker image ls
+
+docker image push bunyawat/kratos-k8s-job
+
+make build
 ./bin/kratos-shell-cmd -conf ./configs
