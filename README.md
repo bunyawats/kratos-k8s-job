@@ -49,3 +49,11 @@ docker build -t <your-docker-image-name> .
 docker run --rm -p 8000:8000 -p 9000:9000 -v </path/to/your/configs>:/data/conf <your-docker-image-name>
 ```
 
+https://go-kratos.dev/en/docs/getting-started/start
+
+
+docker build -t kratos-k8s-job . 
+
+docker run --rm -p 8000:8000 -p 9000:9000 -v ./configs:/data/conf kratos-k8s-job
+
+./bin/kratos-shell-cmd -conf ./configs
