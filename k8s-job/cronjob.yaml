@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kratos-k8s-job
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 30
+      template:
+        spec:
+          volumes:
+            - name: pvol
+              hostPath:
+                path: "/Users/bunyawatsingchai/GolandProjects/kratos-k8s-job/configs"
+          containers:
+          - name: kratos-k8s-job
+            image: bunyawat/kratos-k8s-job
+            imagePullPolicy: IfNotPresent
+            volumeMounts:
+              - mountPath: /data/conf
+                name: pvol
+          restartPolicy: Never

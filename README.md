@@ -62,3 +62,14 @@ docker image push bunyawat/kratos-k8s-job
 
 make build
 ./bin/kratos-shell-cmd -conf ./configs
+
+
+failed to create containerd task: 
+failed to create shim task: 
+OCI runtime create failed: 
+runc create failed: 
+unable to start container process: 
+exec: "kratos-shell-cmd -conf /data/conf": 
+stat kratos-shell-cmd -conf /data/conf: 
+no such file or directory: 
+unknown
