@@ -92,3 +92,4 @@ echo "Password      : $(kubectl get secret --namespace default my-rabbitmq -o js
 
 echo "ErLang Cookie : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d)"
 
+make config

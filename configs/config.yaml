@@ -14,3 +14,8 @@ data:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+  amqp:
+    addr: user:smd95nzXiN30SAXt@localhost:5672
+
+
+

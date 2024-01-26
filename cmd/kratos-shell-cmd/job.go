@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	_ "github.com/go-kratos/kratos/v2/errors"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"reflect"
@@ -11,20 +13,54 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	mysqlQuery "kratos-k8s-job/internal/data/mysql"
+
+	transgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
+	v1 "kratos-k8s-job/api/helloworld/v1"
 )
 
 func runCommand(context.Context) error {
 	msg := "message from K8S"
 	fmt.Printf("Hello Kratos Application: %v\n\n", msg)
 
-	err := queryMySqlDB()
-	if err != nil {
-		log.Println(err)
-	}
-	sendMessage2RabbitMQ(msg)
+	//err := queryMySqlDB()
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//sendMessage2RabbitMQ(msg)
+
+	callGRPC(msg)
 
 	done <- true
 	return nil
+}
+
+func callGRPC(msg string) {
+	conn, err := transgrpc.DialInsecure(
+		context.Background(),
+		transgrpc.WithEndpoint("127.0.0.1:9000"),
+		transgrpc.WithMiddleware(
+			recovery.Recovery(),
+		),
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+	client := v1.NewGreeterClient(conn)
+	reply, err := client.SayHello(context.Background(), &v1.HelloRequest{Name: msg})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("[grpc] SayHello %+v\n", reply)
+
+	// returns error
+	//	_, err = client.SayHello(context.Background(), &v1.HelloRequest{Name: "error"})
+	//	if err != nil {
+	//		log.Printf("[grpc] SayHello error: %v\n", err)
+	//	}
+	//	if errors.IsBadRequest(err) {
+	//		log.Printf("[grpc] SayHello error is invalid argument: %v\n", err)
+	//	}
 }
 
 func queryMySqlDB() error {
@@ -75,7 +111,9 @@ func queryMySqlDB() error {
 }
 
 func sendMessage2RabbitMQ(msg string) {
-	conn, err := amqp.Dial("amqp://user:smd95nzXiN30SAXt@localhost:5672/")
+
+	amqpCf := bc.Data.Amqp
+	conn, err := amqp.Dial("amqp://" + amqpCf.GetAddr())
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
