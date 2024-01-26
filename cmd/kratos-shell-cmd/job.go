@@ -2,19 +2,74 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
+	"reflect"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	mysqlQuery "kratos-k8s-job/internal/data/mysql"
 )
 
 func runCommand(context.Context) error {
 	msg := "message from K8S"
 	fmt.Printf("Hello Kratos Application: %v\n\n", msg)
 
+	err := queryMySqlDB()
+	if err != nil {
+		log.Println(err)
+	}
 	sendMessage2RabbitMQ(msg)
 
 	done <- true
+	return nil
+}
+
+func queryMySqlDB() error {
+	ctx := context.Background()
+
+	fmt.Println("Call queryMySqlDB")
+
+	db, err := sql.Open("mysql", "test:test@/test?parseTime=true")
+	if err != nil {
+		fmt.Println("Connect to database error", err)
+		return err
+	}
+
+	queries := mysqlQuery.New(db)
+
+	// get current template
+	currentTemplate, err := queries.GetCurrentTemplate(ctx, 1)
+	if err != nil {
+		return err
+	}
+	log.Println(currentTemplate)
+
+	// create new current template
+	result, err := queries.CreateCurrentTemplate(ctx, mysqlQuery.CreateCurrentTemplateParams{
+		TemplateName: "Data Privacy",
+		Version:      "1.0",
+	})
+	if err != nil {
+		return err
+	}
+
+	insertedCurrentTemplateID, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	log.Println("insertedCurrentTemplateID", insertedCurrentTemplateID)
+
+	// get the author we just inserted
+	fetchedAuthor, err := queries.GetCurrentTemplate(ctx, insertedCurrentTemplateID)
+	if err != nil {
+		return err
+	}
+
+	// prints true
+	log.Println(reflect.DeepEqual(insertedCurrentTemplateID, fetchedAuthor.ID))
 	return nil
 }
 

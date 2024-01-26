@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/go-kratos/kratos/v2 v2.7.0
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/wire v0.5.0
 	github.com/rabbitmq/amqp091-go v1.9.0
 	go.uber.org/automaxprocs v1.5.1
