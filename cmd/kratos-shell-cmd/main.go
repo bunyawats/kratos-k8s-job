@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"kratos-k8s-job/api/helloworld/v1"
+	log2 "log"
 	"os"
 
 	"kratos-k8s-job/internal/conf"
@@ -29,13 +34,11 @@ var (
 	id, _ = os.Hostname()
 
 	bc   conf.Bootstrap
-	done chan bool
+	done = make(chan bool)
 )
 
 func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
-
-	done = make(chan bool)
 }
 
 func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
@@ -97,4 +100,30 @@ func main() {
 		panic(err)
 	}
 
+}
+
+func runCommand(context.Context) error {
+	msg := "message from K8S"
+	fmt.Printf("Hello Kratos Application: %v\n\n", msg)
+
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint("127.0.0.1:9000"),
+		grpc.WithMiddleware(
+			recovery.Recovery(),
+		),
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+	client := v1.NewGreeterClient(conn)
+	reply, err := client.SayHello(context.Background(), &v1.HelloRequest{Name: msg})
+	if err != nil {
+		log2.Fatal(err)
+	}
+	log2.Printf("[grpc] SayHello %+v\n", reply)
+
+	done <- true
+	return nil
 }
