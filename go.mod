@@ -1,10 +1,11 @@
 module kratos-k8s-job
 
-go 1.19
+go 1.21
 
 require (
 	github.com/go-kratos/kratos/v2 v2.7.0
 	github.com/google/wire v0.5.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	go.uber.org/automaxprocs v1.5.1
 	google.golang.org/genproto/googleapis/api v0.0.0-20230629202037-9506855d4529
 	google.golang.org/grpc v1.56.1

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"fmt"
 	"os"
 
 	"kratos-k8s-job/internal/conf"
@@ -99,11 +97,4 @@ func main() {
 		panic(err)
 	}
 
-}
-
-func runCommand(context.Context) error {
-	msg := "from K8S"
-	fmt.Printf("Hello Kratos Application: %v\n\n", msg)
-	done <- true
-	return nil
 }

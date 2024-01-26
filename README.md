@@ -61,6 +61,7 @@ docker image ls
 docker image push bunyawat/kratos-k8s-job
 
 make build
+
 ./bin/kratos-shell-cmd -conf ./configs
 
 
@@ -73,3 +74,21 @@ exec: "kratos-shell-cmd -conf /data/conf":
 stat kratos-shell-cmd -conf /data/conf: 
 no such file or directory: 
 unknown
+
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+helm install my-rabbitmq bitnami/rabbitmq --version 12.8.0
+
+kubectl port-forward --namespace default svc/my-rabbitmq 5672:5672
+
+kubectl port-forward --namespace default svc/my-rabbitmq 15672:15672
+
+http://127.0.0.1:15672
+
+echo "Username      : user"
+
+echo "Password      : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-password}" | base64 -d)"
+
+echo "ErLang Cookie : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d)"
+
