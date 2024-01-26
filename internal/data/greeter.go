@@ -2,10 +2,8 @@ package data
 
 import (
 	"context"
-
-	"kratos-k8s-job/internal/biz"
-
 	"github.com/go-kratos/kratos/v2/log"
+	"kratos-k8s-job/internal/biz"
 )
 
 type greeterRepo struct {
@@ -22,7 +20,14 @@ func NewGreeterRepo(data *Data, logger log.Logger) biz.GreeterRepo {
 }
 
 func (r *greeterRepo) Save(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
+
+	err := callJob(r, g)
+	if err != nil {
+		return nil, err
+	}
+
 	return g, nil
+
 }
 
 func (r *greeterRepo) Update(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
