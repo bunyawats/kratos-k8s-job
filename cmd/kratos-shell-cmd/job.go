@@ -32,7 +32,8 @@ func queryMySqlDB() error {
 
 	fmt.Println("Call queryMySqlDB")
 
-	db, err := sql.Open("mysql", "test:test@/test?parseTime=true")
+	dbCf := bc.Data.Database
+	db, err := sql.Open(dbCf.GetDriver(), dbCf.GetSource())
 	if err != nil {
 		fmt.Println("Connect to database error", err)
 		return err

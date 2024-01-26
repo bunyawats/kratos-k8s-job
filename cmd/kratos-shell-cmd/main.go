@@ -28,6 +28,7 @@ var (
 
 	id, _ = os.Hostname()
 
+	bc   conf.Bootstrap
 	done chan bool
 )
 
@@ -75,7 +76,6 @@ func main() {
 		panic(err)
 	}
 
-	var bc conf.Bootstrap
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
