@@ -30,7 +30,7 @@ func (q *Queries) CreateCurrentTemplate(ctx context.Context, arg CreateCurrentTe
 
 const getCurrentTemplate = `-- name: GetCurrentTemplate :one
 SELECT template_name, version, id, create_timestamp, consent_template_id FROM last_updated_template
-ORDER BY id DESC
+ORDER BY consent_template_id DESC
 LIMIT 1
 `
 
@@ -50,7 +50,7 @@ func (q *Queries) GetCurrentTemplate(ctx context.Context) (LastUpdatedTemplate, 
 const listAllLastUpdatedTemplate = `-- name: ListAllLastUpdatedTemplate :many
 SELECT template_name, version, id, create_timestamp FROM consent_template
 WHERE id > ?
-ORDER BY id DESC
+ORDER BY id
 `
 
 func (q *Queries) ListAllLastUpdatedTemplate(ctx context.Context, id int64) ([]ConsentTemplate, error) {
