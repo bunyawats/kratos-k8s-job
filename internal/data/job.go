@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/rabbitmq/amqp091-go"
 	"kratos-k8s-job/internal/biz"
@@ -35,8 +34,6 @@ func callJob(r *greeterRepo, g *biz.Greeter) error {
 
 func queryMySqlDB(db *sql.DB, log *log.Helper) ([]Message, error) {
 	ctx := context.Background()
-
-	fmt.Println("Call queryMySqlDB")
 
 	queries := mysql.New(db)
 

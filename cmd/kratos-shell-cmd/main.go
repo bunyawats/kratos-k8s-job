@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"kratos-k8s-job/api/helloworld/v1"
-	log2 "log"
 	"os"
 
 	"kratos-k8s-job/internal/conf"
@@ -30,6 +28,8 @@ var (
 	Version string
 	// flagconf is the config flag.
 	flagconf string
+
+	logger log.Logger
 
 	id, _ = os.Hostname()
 
@@ -59,7 +59,7 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 
 func main() {
 	flag.Parse()
-	logger := log.With(log.NewStdLogger(os.Stdout),
+	logger = log.With(log.NewStdLogger(os.Stdout),
 		"ts", log.DefaultTimestamp,
 		"caller", log.DefaultCaller,
 		"service.id", id,
@@ -104,7 +104,10 @@ func main() {
 
 func runCommand(context.Context) error {
 	msg := "message from K8S"
-	fmt.Printf("Hello Kratos Application: %v\n\n", msg)
+
+	l := log.NewHelper(logger)
+
+	l.Infof("Hello Kratos Application: %v", msg)
 
 	conn, err := grpc.DialInsecure(
 		context.Background(),
@@ -120,9 +123,9 @@ func runCommand(context.Context) error {
 	client := v1.NewGreeterClient(conn)
 	reply, err := client.SayHello(context.Background(), &v1.HelloRequest{Name: msg})
 	if err != nil {
-		log2.Fatal(err)
+		l.Error(err)
 	}
-	log2.Printf("[grpc] SayHello %+v\n", reply)
+	l.Infof("[grpc] SayHello %+v", reply)
 
 	done <- true
 	return nil
