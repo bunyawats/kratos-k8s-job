@@ -1,10 +1,16 @@
 /* name: GetCurrentTemplate :one */
-SELECT * FROM current_template
-WHERE id = ? LIMIT 1;
+SELECT * FROM last_updated_template
+ORDER BY id DESC
+LIMIT 1;
+
+/* name: ListAllLastUpdatedTemplate :many */
+SELECT * FROM consent_template
+WHERE id > ?
+ORDER BY id DESC;
 
 /* name: CreateCurrentTemplate :execresult */
-INSERT INTO current_template (
-    template_name, version
+INSERT INTO last_updated_template (
+    consent_template_id, template_name, version
 ) VALUES (
-    ?, ?
+    ?, ?, ?
 );

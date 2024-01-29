@@ -8,9 +8,17 @@ import (
 	"time"
 )
 
-type CurrentTemplate struct {
+type ConsentTemplate struct {
 	TemplateName    string
 	Version         string
 	ID              int64
 	CreateTimestamp time.Time
+}
+
+type LastUpdatedTemplate struct {
+	TemplateName      string
+	Version           string
+	ID                int64
+	CreateTimestamp   time.Time
+	ConsentTemplateID int64
 }

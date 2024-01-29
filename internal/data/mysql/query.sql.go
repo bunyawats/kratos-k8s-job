@@ -11,35 +11,72 @@ import (
 )
 
 const createCurrentTemplate = `-- name: CreateCurrentTemplate :execresult
-INSERT INTO current_template (
-    template_name, version
+INSERT INTO last_updated_template (
+    consent_template_id, template_name, version
 ) VALUES (
-    ?, ?
+    ?, ?, ?
 )
 `
 
 type CreateCurrentTemplateParams struct {
-	TemplateName string
-	Version      string
+	ConsentTemplateID int64
+	TemplateName      string
+	Version           string
 }
 
 func (q *Queries) CreateCurrentTemplate(ctx context.Context, arg CreateCurrentTemplateParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createCurrentTemplate, arg.TemplateName, arg.Version)
+	return q.db.ExecContext(ctx, createCurrentTemplate, arg.ConsentTemplateID, arg.TemplateName, arg.Version)
 }
 
 const getCurrentTemplate = `-- name: GetCurrentTemplate :one
-SELECT template_name, version, id, create_timestamp FROM current_template
-WHERE id = ? LIMIT 1
+SELECT template_name, version, id, create_timestamp, consent_template_id FROM last_updated_template
+ORDER BY id DESC
+LIMIT 1
 `
 
-func (q *Queries) GetCurrentTemplate(ctx context.Context, id int64) (CurrentTemplate, error) {
-	row := q.db.QueryRowContext(ctx, getCurrentTemplate, id)
-	var i CurrentTemplate
+func (q *Queries) GetCurrentTemplate(ctx context.Context) (LastUpdatedTemplate, error) {
+	row := q.db.QueryRowContext(ctx, getCurrentTemplate)
+	var i LastUpdatedTemplate
 	err := row.Scan(
 		&i.TemplateName,
 		&i.Version,
 		&i.ID,
 		&i.CreateTimestamp,
+		&i.ConsentTemplateID,
 	)
 	return i, err
+}
+
+const listAllLastUpdatedTemplate = `-- name: ListAllLastUpdatedTemplate :many
+SELECT template_name, version, id, create_timestamp FROM consent_template
+WHERE id > ?
+ORDER BY id DESC
+`
+
+func (q *Queries) ListAllLastUpdatedTemplate(ctx context.Context, id int64) ([]ConsentTemplate, error) {
+	rows, err := q.db.QueryContext(ctx, listAllLastUpdatedTemplate, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ConsentTemplate
+	for rows.Next() {
+		var i ConsentTemplate
+		if err := rows.Scan(
+			&i.TemplateName,
+			&i.Version,
+			&i.ID,
+			&i.CreateTimestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
