@@ -20,6 +20,8 @@ WORKDIR /app
 
 EXPOSE 8000
 EXPOSE 9000
-VOLUME /data/conf
+#VOLUME /data/conf
+
+COPY "configs/config.yaml" "/data/conf/config.yaml"
 
 CMD ["./kratos-shell-cmd", "-conf", "/data/conf"]

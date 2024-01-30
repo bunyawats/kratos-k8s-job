@@ -3,21 +3,22 @@ kind: CronJob
 metadata:
   name: kratos-k8s-job
 spec:
-  schedule: "*/2 * * * *"
+  schedule: "* * * * *"
   jobTemplate:
     spec:
-      ttlSecondsAfterFinished: 30
+      ttlSecondsAfterFinished: 20
       template:
         spec:
-          volumes:
-            - name: pvol
-              hostPath:
-                path: "/Users/bunyawatsingchai/GolandProjects/kratos-k8s-job/configs"
+#          volumes:
+#            - name: pvol
+#              hostPath:
+#                path: "/Users/bunyawatsingchai/GolandProjects/kratos-k8s-job/configs"
           containers:
           - name: kratos-k8s-job
             image: bunyawat/kratos-k8s-job
-            imagePullPolicy: IfNotPresent
-            volumeMounts:
-              - mountPath: /data/conf
-                name: pvol
+#            image: busybox:1.28
+            imagePullPolicy: Always
+#            volumeMounts:
+#              - mountPath: /data/conf
+#                name: pvol
           restartPolicy: Never

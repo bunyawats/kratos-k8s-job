@@ -17,6 +17,9 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 			recovery.Recovery(),
 		),
 	}
+
+	log.Debug("config struct: ", c)
+
 	if c.Grpc.Network != "" {
 		opts = append(opts, grpc.Network(c.Grpc.Network))
 	}

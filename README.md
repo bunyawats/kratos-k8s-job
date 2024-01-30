@@ -49,12 +49,21 @@ docker build -t <your-docker-image-name> .
 docker run --rm -p 8000:8000 -p 9000:9000 -v </path/to/your/configs>:/data/conf <your-docker-image-name>
 ```
 
+https://sqlc.dev/
+
+cd internal/data/mysql
+
+sqlc generate
+
 https://go-kratos.dev/en/docs/getting-started/start
 
 
 docker build -t bunyawat/kratos-k8s-job . 
 
-docker run --rm -p 8000:8000 -p 9000:9000 -v ./configs:/data/conf bunyawat/kratos-k8s-job
+[//]: # (docker run --rm -p 8000:8000 -p 9000:9000 -v ./configs:/data/conf bunyawat/kratos-k8s-job)
+
+docker run --rm -p 8000:8000 -p 9000:9000  bunyawat/kratos-k8s-job
+
 
 docker image ls
 
@@ -65,16 +74,7 @@ make build
 ./bin/kratos-shell-cmd -conf ./configs
 
 
-failed to create containerd task: 
-failed to create shim task: 
-OCI runtime create failed: 
-runc create failed: 
-unable to start container process: 
-exec: "kratos-shell-cmd -conf /data/conf": 
-stat kratos-shell-cmd -conf /data/conf: 
-no such file or directory: 
-unknown
-
+https://rabbitmq.com/
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
