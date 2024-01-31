@@ -29,6 +29,11 @@ func callJob(r *greeterRepo, g *biz.Greeter) error {
 		return err
 	}
 
+	err = readInfluxDB(r.data.InfluxDBClient, r.data.Bucket)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
