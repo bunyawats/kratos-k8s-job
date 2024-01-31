@@ -8,19 +8,20 @@ server:
 data:
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test
-#    source: test:test@tcp(host.docker.internal)/test?parseTime=true
+    #    source: root:root@tcp(127.0.0.1:3306)/test
+    source: test:test@tcp(host.docker.internal)/test?parseTime=true
   redis:
-    addr: 127.0.0.1:6379
-#    addr: host.docker.internal:6379
+    #    addr: 127.0.0.1:6379
+    addr: host.docker.internal:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
   amqp:
-    addr: user:smd95nzXiN30SAXt@localhost:5672
-#    addr: user:smd95nzXiN30SAXt@host.docker.internal:5672
+    #    addr: user:smd95nzXiN30SAXt@localhost:5672
+    addr: user:smd95nzXiN30SAXt@host.docker.internal:5672
   influxdb:
     addr: https://us-east-1-1.aws.cloud2.influxdata.com
     token: tOcSMS46PCpylMuTbvDNMt6iZs-7YlsAbsjXHXPIsNuKMFHgWgLNE9Zp0ukNnfvtkAhVXJqc_tOApztwYdy6mQ==
     bucket: iot-deveice
+
 
 
