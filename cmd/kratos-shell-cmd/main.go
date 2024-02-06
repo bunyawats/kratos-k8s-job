@@ -103,11 +103,11 @@ func main() {
 }
 
 func runCommand(context.Context) error {
-	msg := "message from K8S"
+	msg := "runCommand msg"
 
 	l := log.NewHelper(logger)
 
-	l.Infof("Hello Kratos Application: %v", msg)
+	l.Info(msg)
 
 	conn, err := grpc.DialInsecure(
 		context.Background(),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
+	"time"
 )
 
 func main() {
@@ -62,23 +63,23 @@ func main() {
 			"count":    40,
 		},
 	}
-	fmt.Print("data", data)
+	fmt.Print("data \n", data)
 
 	//Write data
-	//options := influxdb3.WriteOptions{
-	//	Database: database,
-	//}
-	//for key := range data {
-	//	point := influxdb3.NewPointWithMeasurement("census").
-	//		SetTag("location", data[key]["location"].(string)).
-	//		SetField(data[key]["species"].(string), data[key]["count"])
-	//
-	//	if err := client.WritePointsWithOptions(context.Background(), &options, point); err != nil {
-	//		panic(err)
-	//	}
-	//
-	//	time.Sleep(1 * time.Second) // separate points by 1 second
-	//}
+	options := influxdb3.WriteOptions{
+		Database: database,
+	}
+	for key := range data {
+		point := influxdb3.NewPointWithMeasurement("census").
+			SetTag("location", data[key]["location"].(string)).
+			SetField(data[key]["species"].(string), data[key]["count"])
+
+		if err := client.WritePointsWithOptions(context.Background(), &options, point); err != nil {
+			panic(err)
+		}
+
+		time.Sleep(1 * time.Second) // separate points by 1 second
+	}
 
 	// Execute query
 	query := `SELECT *
