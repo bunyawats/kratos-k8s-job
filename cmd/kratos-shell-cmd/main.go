@@ -120,6 +120,7 @@ func runCommand(context.Context) error {
 		panic(err)
 	}
 	defer conn.Close()
+
 	client := v1.NewGreeterClient(conn)
 	reply, err := client.SayHello(context.Background(), &v1.HelloRequest{Name: msg})
 	if err != nil {

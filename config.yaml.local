@@ -8,7 +8,7 @@ server:
 data:
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test
+    source: test:test@tcp(127.0.0.1:3306)/test?parseTime=true
 #    source: test:test@tcp(host.docker.internal)/test?parseTime=true
   redis:
     addr: 127.0.0.1:6379

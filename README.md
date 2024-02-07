@@ -94,3 +94,11 @@ echo "Username      : user"
 echo "Password      : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-password}" | base64 -d)"
 
 echo "ErLang Cookie : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d)"
+
+
+```azure
+SELECT "/memory/classes/metadata/other:bytes", "time"
+FROM "metrics"
+WHERE
+time >= now() - interval '12 hours'
+```
