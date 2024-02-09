@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package api.scheduler.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "kratos-k8s-job/api/scheduler/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.scheduler.v1";
+
+service Job {
+	rpc ExecuteJob (ExecuteJobRequest) returns (ExecuteJobReply){
+		option (google.api.http) = {
+			post: "/scheduler/execute_job"
+			body: "*"
+		};
+	};
+}
+
+message ExecuteJobRequest {}
+message ExecuteJobReply {}
+

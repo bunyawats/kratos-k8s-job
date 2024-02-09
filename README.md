@@ -11,11 +11,11 @@ kratos new server
 
 cd server
 # Add a proto template
-kratos proto add api/server/server.proto
+% kratos proto add api/scheduler/v1/job.proto  
 # Generate the proto code
-kratos proto client api/server/server.proto
+kratos proto client api/scheduler/v1/job.proto  
 # Generate the source code of service by proto file
-kratos proto server api/server/server.proto -t internal/service
+kratos proto server api/scheduler/v1/job.proto   -t internal/service
 
 go generate ./...
 go build -o ./bin/ ./...
