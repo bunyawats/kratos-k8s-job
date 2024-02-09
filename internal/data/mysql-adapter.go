@@ -9,20 +9,20 @@ import (
 )
 
 type (
-	jobRepo struct {
+	M struct {
 		data *Data
 		log  *log.Helper
 	}
 )
 
-func NewJobRepo(data *Data, logger log.Logger) biz.JobRepo {
-	return &jobRepo{
+func NewMySqlAdapter(data *Data, logger log.Logger) biz.MySqlAdapter {
+	return &M{
 		data: data,
 		log:  log.NewHelper(logger),
 	}
 }
 
-func (r *jobRepo) QueryMySqlDB(ctx context.Context) ([]biz.Message, error) {
+func (r *M) QueryMySqlDB(ctx context.Context) ([]biz.Message, error) {
 
 	queries := mysql.New(r.data.MySqlDB)
 

@@ -9,7 +9,21 @@ import (
 	"time"
 )
 
-func (r *jobRepo) SendMessage2RabbitMQ(ctx context.Context, messages []biz.Message) error {
+type (
+	R struct {
+		data *Data
+		log  *log.Helper
+	}
+)
+
+func NewRabbitMqAdapter(data *Data, logger log.Logger) biz.RabbitMqAdapter {
+	return &R{
+		data: data,
+		log:  log.NewHelper(logger),
+	}
+}
+
+func (r *R) SendMessage2RabbitMQ(ctx context.Context, messages []biz.Message) error {
 
 	ch, err := r.data.AmqpConn.Channel()
 	if err != nil {

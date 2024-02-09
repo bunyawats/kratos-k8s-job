@@ -28,8 +28,10 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logLogger log.Logger)
 	if err != nil {
 		return nil, nil, err
 	}
-	jobRepo := data.NewJobRepo(dataData, logLogger)
-	jobUseCase := biz.NewJobUseCase(jobRepo, logLogger)
+	mySqlAdapter := data.NewMySqlAdapter(dataData, logLogger)
+	rabbitMqAdapter := data.NewRabbitMqAdapter(dataData, logLogger)
+	influxDbAdapter := data.NewInfluxDbAdapter(dataData, logLogger)
+	jobUseCase := biz.NewJobUseCase(mySqlAdapter, rabbitMqAdapter, influxDbAdapter, logLogger)
 	jobService := service.NewJobService(jobUseCase)
 	grpcServer := server.NewGRPCServer(confServer, jobService, logLogger)
 	httpServer := server.NewHTTPServer(confServer, jobService, logLogger)
