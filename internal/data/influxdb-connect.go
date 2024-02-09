@@ -6,7 +6,7 @@ import (
 	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
 )
 
-func readInfluxDB(client *influxdb3.Client, bucket string) error {
+func (r *jobRepo) ReadInfluxDB(ctx context.Context) error {
 
 	// Execute query
 	query := `SELECT *
@@ -15,9 +15,9 @@ func readInfluxDB(client *influxdb3.Client, bucket string) error {
             AND ('bees' IS NOT NULL OR 'ants' IS NOT NULL)`
 
 	queryOptions := influxdb3.QueryOptions{
-		Database: bucket,
+		Database: r.data.Bucket,
 	}
-	iterator, err := client.QueryWithOptions(context.Background(), &queryOptions, query)
+	iterator, err := r.data.InfluxDBClient.QueryWithOptions(context.Background(), &queryOptions, query)
 
 	if err != nil {
 		panic(err)
