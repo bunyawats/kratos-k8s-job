@@ -6,23 +6,45 @@ import (
 	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
 	"github.com/go-kratos/kratos/v2/log"
 	"kratos-k8s-job/internal/biz"
+	"kratos-k8s-job/internal/conf"
 )
 
 type (
-	I struct {
-		data *Data
-		log  *log.Helper
+	iAdapter struct {
+		InfluxDBClient *influxdb3.Client
+		Bucket         string
+		log            *log.Helper
 	}
 )
 
-func NewInfluxDbAdapter(data *Data, logger log.Logger) biz.InfluxDbAdapter {
-	return &I{
-		data: data,
-		log:  log.NewHelper(logger),
+func NewInfluxDbAdapter(c *conf.Data, logger log.Logger) (biz.InfluxDbAdapter, func(), error) {
+
+	l := log.NewHelper(logger)
+
+	influxCf := c.Influxdb
+	l.Debug("influxdb address: ", influxCf.GetAddr())
+	l.Debug("influxdb token: ", influxCf.GetToken())
+	influxClient, err := influxdb3.New(influxdb3.ClientConfig{
+		Host:  influxCf.Addr,
+		Token: influxCf.Token,
+	})
+	if err != nil {
+		l.Error("Fail on connect to InfluxDB")
+		return nil, nil, err
 	}
+
+	cleanup := func() {
+		l.Info("closing InfluxDB connection")
+		influxClient.Close()
+	}
+
+	return &iAdapter{
+		InfluxDBClient: influxClient,
+		Bucket:         influxCf.Bucket,
+	}, cleanup, nil
 }
 
-func (r *I) ReadInfluxDB(ctx context.Context) error {
+func (i *iAdapter) ReadInfluxDB(ctx context.Context) error {
 
 	// Execute query
 	query := `SELECT *
@@ -31,9 +53,9 @@ func (r *I) ReadInfluxDB(ctx context.Context) error {
             AND ('bees' IS NOT NULL OR 'ants' IS NOT NULL)`
 
 	queryOptions := influxdb3.QueryOptions{
-		Database: r.data.Bucket,
+		Database: i.Bucket,
 	}
-	iterator, err := r.data.InfluxDBClient.QueryWithOptions(context.Background(), &queryOptions, query)
+	iterator, err := i.InfluxDBClient.QueryWithOptions(context.Background(), &queryOptions, query)
 
 	if err != nil {
 		panic(err)

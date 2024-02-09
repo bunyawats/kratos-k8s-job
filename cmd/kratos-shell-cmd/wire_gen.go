@@ -24,19 +24,29 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logLogger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logLogger)
+	mySqlAdapter, cleanup, err := data.NewMySqlAdapter(confData, logLogger)
 	if err != nil {
 		return nil, nil, err
 	}
-	mySqlAdapter := data.NewMySqlAdapter(dataData, logLogger)
-	rabbitMqAdapter := data.NewRabbitMqAdapter(dataData, logLogger)
-	influxDbAdapter := data.NewInfluxDbAdapter(dataData, logLogger)
+	rabbitMqAdapter, cleanup2, err := data.NewRabbitMqAdapter(confData, logLogger)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	influxDbAdapter, cleanup3, err := data.NewInfluxDbAdapter(confData, logLogger)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	jobUseCase := biz.NewJobUseCase(mySqlAdapter, rabbitMqAdapter, influxDbAdapter, logLogger)
 	jobService := service.NewJobService(jobUseCase)
 	grpcServer := server.NewGRPCServer(confServer, jobService, logLogger)
 	httpServer := server.NewHTTPServer(confServer, jobService, logLogger)
 	app := newApp(logLogger, grpcServer, httpServer)
 	return app, func() {
+		cleanup3()
+		cleanup2()
 		cleanup()
 	}, nil
 }

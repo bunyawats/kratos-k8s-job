@@ -2,29 +2,48 @@ package data
 
 import (
 	"context"
+	"database/sql"
 	"github.com/go-kratos/kratos/v2/log"
+	_ "github.com/go-sql-driver/mysql"
 	"kratos-k8s-job/internal/biz"
+	"kratos-k8s-job/internal/conf"
 
 	"kratos-k8s-job/internal/data/mysql"
 )
 
 type (
-	M struct {
-		data *Data
-		log  *log.Helper
+	mAdapter struct {
+		MySqlDB *sql.DB
+		log     *log.Helper
 	}
 )
 
-func NewMySqlAdapter(data *Data, logger log.Logger) biz.MySqlAdapter {
-	return &M{
-		data: data,
-		log:  log.NewHelper(logger),
+func NewMySqlAdapter(c *conf.Data, logger log.Logger) (biz.MySqlAdapter, func(), error) {
+
+	l := log.NewHelper(logger)
+
+	dbCf := c.Database
+	l.Debug("mysql source: ", dbCf.GetSource())
+	db, err := sql.Open(dbCf.GetDriver(), dbCf.GetSource())
+	if err != nil {
+		l.Error("Fail on connect to MySql")
+		return nil, nil, err
 	}
+
+	cleanup := func() {
+		l.Info("closing mysql connection")
+		db.Close()
+	}
+
+	return &mAdapter{
+		MySqlDB: db,
+		log:     log.NewHelper(logger),
+	}, cleanup, nil
 }
 
-func (r *M) QueryMySqlDB(ctx context.Context) ([]biz.Message, error) {
+func (r *mAdapter) QueryMySqlDB(ctx context.Context) ([]biz.Message, error) {
 
-	queries := mysql.New(r.data.MySqlDB)
+	queries := mysql.New(r.MySqlDB)
 
 	var lastTempalteId int64
 	// get current template

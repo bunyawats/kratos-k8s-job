@@ -4,28 +4,45 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/rabbitmq/amqp091-go"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"kratos-k8s-job/internal/biz"
+	"kratos-k8s-job/internal/conf"
 	"time"
 )
 
 type (
-	R struct {
-		data *Data
-		log  *log.Helper
+	rAdapter struct {
+		AmqpConn *amqp.Connection
+		log      *log.Helper
 	}
 )
 
-func NewRabbitMqAdapter(data *Data, logger log.Logger) biz.RabbitMqAdapter {
-	return &R{
-		data: data,
-		log:  log.NewHelper(logger),
+func NewRabbitMqAdapter(c *conf.Data, logger log.Logger) (biz.RabbitMqAdapter, func(), error) {
+
+	l := log.NewHelper(logger)
+
+	amqpCf := c.Amqp
+	l.Debug("rabbitmq address: ", amqpCf.GetAddr())
+	conn, err := amqp.Dial("amqp://" + amqpCf.GetAddr())
+	if err != nil {
+		l.Error("Fail on connect to RabbitMq")
+		return nil, nil, err
 	}
+
+	cleanup := func() {
+		l.Info("closing rabbitmq connection")
+		conn.Close()
+	}
+
+	return &rAdapter{
+		AmqpConn: conn,
+		log:      log.NewHelper(logger),
+	}, cleanup, nil
 }
 
-func (r *R) SendMessage2RabbitMQ(ctx context.Context, messages []biz.Message) error {
+func (r *rAdapter) SendMessage2RabbitMQ(ctx context.Context, messages []biz.Message) error {
 
-	ch, err := r.data.AmqpConn.Channel()
+	ch, err := r.AmqpConn.Channel()
 	if err != nil {
 		log.Error(err, "Failed to open a channel")
 		return err
@@ -56,7 +73,7 @@ func (r *R) SendMessage2RabbitMQ(ctx context.Context, messages []biz.Message) er
 			q.Name, // routing key
 			false,  // mandatory
 			false,  // immediate
-			amqp091.Publishing{
+			amqp.Publishing{
 				ContentType: "text/json",
 				Body:        body,
 			})
