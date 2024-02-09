@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
-	"kratos-k8s-job/api/helloworld/v1"
+	"kratos-k8s-job/api/scheduler/v1"
 	"os"
 
 	"kratos-k8s-job/internal/conf"
@@ -121,12 +121,12 @@ func runCommand(context.Context) error {
 	}
 	defer conn.Close()
 
-	client := v1.NewGreeterClient(conn)
-	reply, err := client.SayHello(context.Background(), &v1.HelloRequest{Name: msg})
+	client := v1.NewJobClient(conn)
+	reply, err := client.ExecuteJob(context.Background(), &v1.ExecuteJobRequest{})
 	if err != nil {
 		l.Error(err)
 	}
-	l.Infof("[grpc] SayHello %+v", reply)
+	l.Infof("[grpc] ExecuteJob %+v", reply)
 
 	done <- true
 	return nil

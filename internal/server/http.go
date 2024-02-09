@@ -1,7 +1,7 @@
 package server
 
 import (
-	v1 "kratos-k8s-job/api/helloworld/v1"
+	v1 "kratos-k8s-job/api/scheduler/v1"
 	"kratos-k8s-job/internal/conf"
 	"kratos-k8s-job/internal/service"
 
@@ -11,7 +11,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, job *service.JobService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -27,6 +27,6 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	v1.RegisterGreeterHTTPServer(srv, greeter)
+	v1.RegisterJobHTTPServer(srv, job)
 	return srv
 }

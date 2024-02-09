@@ -94,7 +94,7 @@ func main() {
 		}
 		fmt.Println("index: ", i, "\n")
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Second)
 	}
 
 }

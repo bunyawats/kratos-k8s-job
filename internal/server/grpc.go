@@ -1,7 +1,7 @@
 package server
 
 import (
-	v1 "kratos-k8s-job/api/helloworld/v1"
+	v1 "kratos-k8s-job/api/scheduler/v1"
 	"kratos-k8s-job/internal/conf"
 	"kratos-k8s-job/internal/service"
 
@@ -11,7 +11,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, job *service.JobService, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -30,6 +30,6 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterGreeterServer(srv, greeter)
+	v1.RegisterJobServer(srv, job)
 	return srv
 }

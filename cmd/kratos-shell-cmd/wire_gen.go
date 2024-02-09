@@ -7,30 +7,33 @@
 package main
 
 import (
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
 	"kratos-k8s-job/internal/biz"
 	"kratos-k8s-job/internal/conf"
 	"kratos-k8s-job/internal/data"
 	"kratos-k8s-job/internal/server"
 	"kratos-k8s-job/internal/service"
+)
 
-	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
+import (
+	_ "go.uber.org/automaxprocs"
 )
 
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+func wireApp(confServer *conf.Server, confData *conf.Data, logLogger log.Logger) (*kratos.App, func(), error) {
+	dataData, cleanup, err := data.NewData(confData, logLogger)
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
-	greeterService := service.NewGreeterService(greeterUsecase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
-	app := newApp(logger, grpcServer, httpServer)
+	greeterRepo := data.NewGreeterRepo(dataData, logLogger)
+	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logLogger)
+	jobService := service.NewJobService(greeterUsecase)
+	grpcServer := server.NewGRPCServer(confServer, jobService, logLogger)
+	httpServer := server.NewHTTPServer(confServer, jobService, logLogger)
+	app := newApp(logLogger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
 	}, nil
