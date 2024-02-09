@@ -28,9 +28,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logLogger log.Logger)
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logLogger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logLogger)
-	jobService := service.NewJobService(greeterUsecase)
+	jobRepo := data.NewJobRepo(dataData, logLogger)
+	jobUseCase := biz.NewJobUseCase(jobRepo, logLogger)
+	jobService := service.NewJobService(jobUseCase)
 	grpcServer := server.NewGRPCServer(confServer, jobService, logLogger)
 	httpServer := server.NewHTTPServer(confServer, jobService, logLogger)
 	app := newApp(logLogger, grpcServer, httpServer)

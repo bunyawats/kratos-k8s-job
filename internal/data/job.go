@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/rabbitmq/amqp091-go"
-	"kratos-k8s-job/internal/biz"
 	"kratos-k8s-job/internal/data/mysql"
 	"time"
 )
@@ -18,7 +17,7 @@ type (
 	}
 )
 
-func callJob(r *greeterRepo, g *biz.Greeter) error {
+func CallJob(r *jobRepo) error {
 	messageList, err := queryMySqlDB(r.data.MySqlDB, r.log)
 	if err != nil {
 		return err

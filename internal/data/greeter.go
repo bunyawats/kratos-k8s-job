@@ -19,16 +19,7 @@ func NewGreeterRepo(data *Data, logger log.Logger) biz.GreeterRepo {
 	}
 }
 
-func (r *greeterRepo) Save(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
-
-	err := callJob(r, g)
-	if err != nil {
-		return nil, err
-	}
-
-	return g, nil
-
-}
+func (r *greeterRepo) Save(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) { return g, nil }
 
 func (r *greeterRepo) Update(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
 	return g, nil

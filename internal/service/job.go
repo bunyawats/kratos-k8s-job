@@ -9,15 +9,15 @@ import (
 
 type JobService struct {
 	pb.UnimplementedJobServer
-	uc *biz.GreeterUsecase
+	uc *biz.JobUseCase
 }
 
-func NewJobService(uc *biz.GreeterUsecase) *JobService {
+func NewJobService(uc *biz.JobUseCase) *JobService {
 	return &JobService{uc: uc}
 }
 
 func (s *JobService) ExecuteJob(ctx context.Context, req *pb.ExecuteJobRequest) (*pb.ExecuteJobReply, error) {
-	_, err := s.uc.CreateGreeter(ctx, &biz.Greeter{Hello: "Job Message"})
+	err := s.uc.ExecuteJob(ctx)
 	if err != nil {
 		return nil, err
 	}
