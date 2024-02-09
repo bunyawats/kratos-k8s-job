@@ -18,7 +18,7 @@ type (
 	}
 )
 
-func NewJobRepo(data *Data, logger log.Logger) *jobRepo {
+func NewJobRepo(data *Data, logger log.Logger) biz.JobRepo {
 	return &jobRepo{
 		data: data,
 		log:  log.NewHelper(logger),
