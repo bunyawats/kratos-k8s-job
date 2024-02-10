@@ -1,6 +1,6 @@
 module kratos-k8s-job
 
-go 1.21
+go 1.22
 
 require (
 	github.com/InfluxCommunity/influxdb3-go v0.5.0
