@@ -6,6 +6,10 @@ WORKDIR /src
 #RUN GOPROXY=https://goproxy.cn make build
 RUN make build
 
+COPY "mcafee_certificate.pem" "/tmp/mcafee_certificate.pem"
+RUN cat /tmp/mcafee_certificate.pem >> /etc/ssl/certs/ca-certificates.crt
+
+
 FROM debian:stable-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates netbase \
