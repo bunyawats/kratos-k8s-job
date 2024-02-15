@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"runtime/metrics"
-	"strconv"
 )
 
 func GetGoRuntimeMetrics() (map[string]interface{}, error) {
@@ -33,8 +32,8 @@ func GetGoRuntimeMetrics() (map[string]interface{}, error) {
 		case metrics.KindFloat64:
 			currentMatrix[name] = value.Float64()
 		case metrics.KindFloat64Histogram:
-			medianBk := medianBucket(value.Float64Histogram())
-			currentMatrix[name] = strconv.FormatFloat(medianBk, 'f', -1, 64)
+			//medianBk := medianBucket(value.Float64Histogram())
+			//currentMatrix[name] = strconv.FormatFloat(medianBk, 'f', -1, 64)
 		case metrics.KindBad:
 			fmt.Println("bug in runtime/metrics package!")
 		default:
@@ -46,7 +45,7 @@ func GetGoRuntimeMetrics() (map[string]interface{}, error) {
 	return currentMatrix, nil
 }
 
-func medianBucket(h *metrics.Float64Histogram) float64 {
+func MedianBucket(h *metrics.Float64Histogram) float64 {
 	total := uint64(0)
 	for _, count := range h.Counts {
 		total += count

@@ -7,7 +7,7 @@ go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
 ## Create a service
 ```
 # Create a template project
-kratos new server
+kratos new kratos-k8s-job
 
 cd server
 # Add a proto template
@@ -15,7 +15,7 @@ cd server
 # Generate the proto code
 kratos proto client api/scheduler/v1/job.proto  
 # Generate the source code of service by proto file
-kratos proto server api/scheduler/v1/job.proto   -t internal/service
+kratos proto server api/scheduler/v1/job.proto -t internal/service
 
 go generate ./...
 go build -o ./bin/ ./...
@@ -49,53 +49,53 @@ docker build -t <your-docker-image-name> .
 docker run --rm -p 8000:8000 -p 9000:9000 -v </path/to/your/configs>:/data/conf <your-docker-image-name>
 ```
 
-
-make config
-
-https://sqlc.dev/
-
-cd internal/data/mysql
-
-sqlc generate
+===============================================================
 
 https://go-kratos.dev/en/docs/getting-started/start
+* make build
+* ./bin/kratos-shell-cmd -conf ./configs
 
 
-docker build -t bunyawat/kratos-k8s-job . 
+## Update Config data model
+* make config
 
-[//]: # (docker run --rm -p 8000:8000 -p 9000:9000 -v ./configs:/data/conf bunyawat/kratos-k8s-job)
+## SQLC
+https://sqlc.dev/
+* cd internal/data/mysql
+* sqlc generate
 
-docker run --rm -p 8000:8000 -p 9000:9000  bunyawat/kratos-k8s-job
-
-
-docker image ls
-
-docker image push bunyawat/kratos-k8s-job
-
-make build
-
-./bin/kratos-shell-cmd -conf ./configs
+## Docker
+* docker build -t bunyawat/kratos-k8s-job .
+* docker run --rm -p 8000:8000 -p 9000:9000  bunyawat/kratos-k8s-job
+* docker image ls
+* docker image push bunyawat/kratos-k8s-job
 
 
+## RabbitMQ
 https://rabbitmq.com/
 
-helm repo add bitnami https://charts.bitnami.com/bitnami
+* helm repo add bitnami https://charts.bitnami.com/bitnami
+* helm install my-rabbitmq bitnami/rabbitmq --version 12.8.0
+* kubectl port-forward --namespace default svc/my-rabbitmq 5672:5672
+* kubectl port-forward --namespace default svc/my-rabbitmq 15672:15672
+rabbitmq dashboard: http://127.0.0.1:15672
 
-helm install my-rabbitmq bitnami/rabbitmq --version 12.8.0
-
-kubectl port-forward --namespace default svc/my-rabbitmq 5672:5672
-
-kubectl port-forward --namespace default svc/my-rabbitmq 15672:15672
-
-http://127.0.0.1:15672
-
-echo "Username      : user"
-
-echo "Password      : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-password}" | base64 -d)"
-
-echo "ErLang Cookie : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d)"
+* echo "Username      : user"  
+* echo "Password      : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-password}" | base64 -d)"  
+* echo "ErLang Cookie : $(kubectl get secret --namespace default my-rabbitmq -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d)"  
 
 
+## Kubernetes
+* kind get clusters  
+* export POD_NAME=$(kubectl get pods -n kubernetes-dashboard -l "app.kubernetes.io/name=kubernetes-dashboard,app.kubernetes.io/instance=kubernetes-dashboard" -o jsonpath="{.items[0].metadata.name}")  
+* kubectl -n kubernetes-dashboard port-forward $POD_NAME 8443:8443
+Kubernetes dashboard: https://127.0.0.1:8443/
+* kubectl create -f cronjob.yaml
+* kubectl get cronjob kratos-k8s-job
+* kubectl delete cronjob kratos-k8s-job
+
+
+## InfluxDB
 ```azure
 SELECT "/memory/classes/metadata/other:bytes", "time"
 FROM "metrics"
