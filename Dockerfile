@@ -1,5 +1,5 @@
 FROM golang:1.22 AS builder
-cleaCOPY . /src
+COPY . /src
 WORKDIR /src
 #RUN GOPROXY=https://goproxy.cn make build
 RUN make build
