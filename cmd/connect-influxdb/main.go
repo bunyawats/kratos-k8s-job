@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
+	"os"
 	"time"
 )
 
 func main() {
 	// Create client
 	url := "https://us-east-1-1.aws.cloud2.influxdata.com"
-	token := "tOcSMS46PCpylMuTbvDNMt6iZs-7YlsAbsjXHXPIsNuKMFHgWgLNE9Zp0ukNnfvtkAhVXJqc_tOApztwYdy6mQ=="
-
+	//token := "tOcSMS46PCpylMuTbvDNMt6iZs-7YlsAbsjXHXPIsNuKMFHgWgLNE9Zp0ukNnfvtkAhVXJqc_tOApztwYdy6mQ=="
+	token := os.Getenv("INFLUXDB_API_KEY")
 	// Create a new client using an InfluxDB server base URL and an authentication token
 	client, err := influxdb3.New(influxdb3.ClientConfig{
 		Host:  url,
@@ -29,7 +30,7 @@ func main() {
 		}
 	}(client)
 
-	database := "iot-deveice"
+	database := "k8s-job"
 
 	data := map[string]map[string]interface{}{
 		"point1": {
