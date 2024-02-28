@@ -73,24 +73,13 @@ func (i *iAdapter) ReadInfluxDB(ctx context.Context) error {
 	return nil
 }
 
-func (i *iAdapter) WriteMatrix2InfluxDB(runtimeMetrics map[string]interface{}) error {
+func (i *iAdapter) WriteMetric2InfluxDB(rtmPoints []*influxdb3.Point) error {
 
 	options := influxdb3.WriteOptions{
 		Database: i.Bucket,
 	}
 
-	point := influxdb3.NewPointWithMeasurement("metrics")
-	for metricName, metricValue := range runtimeMetrics {
-		switch metricValue.(type) {
-		case string:
-			point.SetTag(metricName, fmt.Sprintf("%v", metricValue))
-		default:
-			point.SetField(metricName, metricValue)
-		}
-
-	}
-
-	if err := i.InfluxDBClient.WritePointsWithOptions(context.Background(), &options, point); err != nil {
+	if err := i.InfluxDBClient.WritePointsWithOptions(context.Background(), &options, rtmPoints...); err != nil {
 		log.Warnf("error while writing point to InfluxD: %v", err)
 		return err
 	}

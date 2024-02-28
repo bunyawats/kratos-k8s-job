@@ -20,8 +20,8 @@ data:
 #    addr: user:smd95nzXiN30SAXt@host.docker.internal:5672
   influxdb:
     addr: https://us-east-1-1.aws.cloud2.influxdata.com
-    token: tOcSMS46PCpylMuTbvDNMt6iZs-7YlsAbsjXHXPIsNuKMFHgWgLNE9Zp0ukNnfvtkAhVXJqc_tOApztwYdy6mQ==
-    bucket: iot-deveice
+    token: ---
+    bucket:  k8s-job
 
 
 

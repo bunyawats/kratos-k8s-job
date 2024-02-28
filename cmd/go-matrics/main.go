@@ -66,13 +66,13 @@ func main() {
 				point := influxdb3.NewPointWithMeasurement("metrics-simple")
 				point.SetField("KindUint64", value.Uint64())
 				point.SetTag("Name", name)
-				//pts = append(pts, point)
+				pts = append(pts, point)
 			case metrics.KindFloat64:
 				fmt.Printf("KindFloat64\n: %s\n: %f\n", name, value.Float64())
 				point := influxdb3.NewPointWithMeasurement("metrics-simple")
 				point.SetField("KindFloat64", value.Float64())
 				point.SetTag("Name", name)
-				//pts = append(pts, point)
+				pts = append(pts, point)
 			case metrics.KindFloat64Histogram:
 				// The histogram may be quite large, so let's just pull out
 				// a crude estimate for the median for the sake of this example.

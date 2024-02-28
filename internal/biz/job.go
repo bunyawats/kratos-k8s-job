@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
 	"github.com/go-kratos/kratos/v2/log"
 	"kratos-k8s-job/internal/common"
 )
@@ -22,7 +23,7 @@ type (
 
 	InfluxDbAdapter interface {
 		ReadInfluxDB(context.Context) error
-		WriteMatrix2InfluxDB(map[string]interface{}) error
+		WriteMetric2InfluxDB([]*influxdb3.Point) error
 	}
 )
 
@@ -55,11 +56,11 @@ func (uc *JobUseCase) ExecuteJob(ctx context.Context) error {
 		return err
 	}
 
-	runtimeMatrix, err := common.GetGoRuntimeMetrics()
+	pts, err := common.GetGoRuntimeMetrics()
 	if err != nil {
 		log.Warnf("Fail on get runtime matix: %v", err)
 	}
-	err = uc.WriteMatrix2InfluxDB(runtimeMatrix)
+	err = uc.WriteMetric2InfluxDB(pts)
 	if err != nil {
 		log.Warnf("Fail on write runtime matix to influxdb: %v", err)
 	}
