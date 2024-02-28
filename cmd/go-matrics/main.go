@@ -46,7 +46,7 @@ func main() {
 		samples[i].Name = descs[i].Name
 	}
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 10; i++ {
 
 		// Sample the metrics. Re-use the samples slice if you can!
 		metrics.Read(samples)
@@ -66,20 +66,53 @@ func main() {
 				point := influxdb3.NewPointWithMeasurement("metrics-simple")
 				point.SetField("KindUint64", value.Uint64())
 				point.SetTag("Name", name)
-				pts = append(pts, point)
+				//pts = append(pts, point)
 			case metrics.KindFloat64:
 				fmt.Printf("KindFloat64\n: %s\n: %f\n", name, value.Float64())
 				point := influxdb3.NewPointWithMeasurement("metrics-simple")
 				point.SetField("KindFloat64", value.Float64())
 				point.SetTag("Name", name)
-				pts = append(pts, point)
+				//pts = append(pts, point)
 			case metrics.KindFloat64Histogram:
 				// The histogram may be quite large, so let's just pull out
 				// a crude estimate for the median for the sake of this example.
 				//medianBk := medianBucket(value.Float64Histogram())
 				fmt.Printf("\nKindFloat64Histogram\n: %s\n: %v\n", name, value.Float64Histogram())
-				fmt.Printf("bucket len: %v\n", len(value.Float64Histogram().Buckets))
 				//point.SetTag(name, strconv.FormatFloat(medianBk, 'f', -1, 64))
+
+				point := influxdb3.NewPointWithMeasurement("metrics-simple")
+
+				const maxBucketLen = 70
+
+				startIndex := 0
+				bucketLen := len(value.Float64Histogram().Buckets) - 1
+				if bucketLen > maxBucketLen {
+					midIndex := bucketLen / 2
+					startIndex = midIndex - (maxBucketLen / 2)
+					bucketLen = maxBucketLen
+				}
+
+				fmt.Println("bucketLen: ", bucketLen)
+				fmt.Println("startIndex: ", startIndex)
+				for i := 0; i < bucketLen; i++ {
+					index := i - startIndex
+					if index >= 0 && index < bucketLen {
+
+						countValue := value.Float64Histogram().Counts[i]
+						bucketValue := value.Float64Histogram().Buckets[i]
+						if bucketValue < 0 {
+							bucketValue = 0.0
+						}
+
+						point.SetField(fmt.Sprintf("count[%v]", index), countValue)
+						point.SetField(fmt.Sprintf("bucket[%v]", index), bucketValue)
+					}
+
+				}
+
+				point.SetTag("Name", name)
+
+				pts = append(pts, point)
 			case metrics.KindBad:
 				// This should never happen because all metrics are supported
 				// by construction.
@@ -103,20 +136,4 @@ func main() {
 		time.Sleep(time.Second)
 	}
 
-}
-
-func medianBucket(h *metrics.Float64Histogram) float64 {
-	total := uint64(0)
-	for _, count := range h.Counts {
-		total += count
-	}
-	thresh := total / 2
-	total = 0
-	for i, count := range h.Counts {
-		total += count
-		if total >= thresh {
-			return h.Buckets[i]
-		}
-	}
-	panic("should not happen")
 }
