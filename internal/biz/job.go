@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
 	"github.com/go-kratos/kratos/v2/log"
-	"kratos-k8s-job/internal/common"
+	"kratos-k8s-job/internal/utility"
 )
 
 type (
@@ -56,7 +56,7 @@ func (uc *JobUseCase) ExecuteJob(ctx context.Context) error {
 		return err
 	}
 
-	pts, err := common.GetGoRuntimeMetrics()
+	pts, err := utility.GetGoRuntimeMetrics()
 	if err != nil {
 		log.Warnf("Fail on get runtime matix: %v", err)
 	}
