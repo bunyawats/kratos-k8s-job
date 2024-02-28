@@ -102,3 +102,6 @@ FROM "metrics"
 WHERE
 time >= now() - interval '12 hours'
 ```
+
+## READ Configuration for system environment 
+export KRATOS_INFLUXDB_TOKEN=<your secret token>

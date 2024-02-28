@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/go-kratos/kratos/v2/config/env"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"kratos-k8s-job/api/scheduler/v1"
 	"os"
@@ -70,6 +71,7 @@ func main() {
 	)
 	c := config.New(
 		config.WithSource(
+			env.NewSource("KRATOS_"),
 			file.NewSource(flagconf),
 		),
 	)

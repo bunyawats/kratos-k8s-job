@@ -17,7 +17,7 @@ data:
     addr: user:smd95nzXiN30SAXt@localhost:5672
   influxdb:
     addr: https://us-east-1-1.aws.cloud2.influxdata.com
-    token: ---
+    token: "${INFLUXDB_TOKEN}"
     bucket:  k8s-job
 
 
