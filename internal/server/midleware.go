@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"github.com/InfluxCommunity/influxdb3-go/influxdb3"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware"
@@ -46,37 +45,12 @@ func NewInfluxDbMiddleware(c *conf.Data, logger log.Logger) (*influxDbMiddleware
 	}, cleanup, nil
 }
 
-//func (ifm *influxDbMiddleware) cleanup() {
-//	ifm.log.Info("closing Middleware InfluxDB connection")
-//	ifm.InfluxDBClient.Close()
-//}
+func (ifm *influxDbMiddleware) WriteMetric2InfluxDB() {
 
-func (ifm *influxDbMiddleware) runtimeMetricInfluxDbMiddleware(handler middleware.Handler) middleware.Handler {
-
-	return func(ctx context.Context, req interface{}) (reply interface{}, err error) {
-
-		fmt.Println("\nRuntime Metric InfluxDb middleware in", req)
-		reply, err = handler(ctx, req)
-
-		///////////////////////////////////////////////////////////////////////
-
-		pts, err := utility.GetGoRuntimeMetrics()
-		if err != nil {
-			log.Warnf("Fail on get runtime matix: %v", err)
-		}
-		err = ifm.WriteMetric2InfluxDB(pts)
-		if err != nil {
-			log.Warnf("Fail on write runtime matix to influxdb: %v", err)
-		}
-
-		///////////////////////////////////////////////////////////////////////
-
-		fmt.Println("Runtime Metric InfluxDb middleware out", reply)
-		return
+	rtmPoints, err := utility.GetGoRuntimeMetrics()
+	if err != nil {
+		log.Warnf("Fail on get runtime matix: %v", err)
 	}
-}
-
-func (ifm *influxDbMiddleware) WriteMetric2InfluxDB(rtmPoints []*influxdb3.Point) error {
 
 	options := influxdb3.WriteOptions{
 		Database: ifm.Bucket,
@@ -84,7 +58,22 @@ func (ifm *influxDbMiddleware) WriteMetric2InfluxDB(rtmPoints []*influxdb3.Point
 
 	if err := ifm.InfluxDBClient.WritePointsWithOptions(context.Background(), &options, rtmPoints...); err != nil {
 		log.Warnf("error while writing point to InfluxD: %v", err)
-		return err
 	}
-	return nil
+
+	if err != nil {
+		ifm.log.Warnf("Fail on write runtime matix to influxdb: %v", err)
+	}
+}
+
+func (ifm *influxDbMiddleware) runtimeMetricInfluxDbMiddleware(handler middleware.Handler) middleware.Handler {
+
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+
+		ifm.log.Debug("\nRuntime Metric InfluxDb middleware in", req)
+		reply, err := handler(ctx, req)
+		ifm.WriteMetric2InfluxDB()
+		ifm.log.Debug("Runtime Metric InfluxDb middleware out", reply)
+
+		return reply, err
+	}
 }
