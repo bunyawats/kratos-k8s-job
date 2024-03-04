@@ -33,15 +33,15 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logLogger log.Logger)
 		cleanup()
 		return nil, nil, err
 	}
-	influxDbAdapter, cleanup3, err := data.NewInfluxDbAdapter(confData, logLogger)
+	jobUseCase := biz.NewJobUseCase(mySqlAdapter, rabbitMqAdapter, logLogger)
+	jobService := service.NewJobService(jobUseCase)
+	influxDbMiddleware, cleanup3, err := server.NewInfluxDbMiddleware(confData, logLogger)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	jobUseCase := biz.NewJobUseCase(mySqlAdapter, rabbitMqAdapter, influxDbAdapter, logLogger)
-	jobService := service.NewJobService(jobUseCase)
-	grpcServer := server.NewGRPCServer(confServer, jobService, logLogger)
+	grpcServer := server.NewGRPCServer(confServer, jobService, logLogger, influxDbMiddleware)
 	httpServer := server.NewHTTPServer(confServer, jobService, logLogger)
 	app := newApp(logLogger, grpcServer, httpServer)
 	return app, func() {
