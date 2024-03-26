@@ -4,12 +4,12 @@ go 1.22
 
 require (
 	github.com/InfluxCommunity/influxdb3-go v0.6.0
-	github.com/go-kratos/kratos/v2 v2.7.2
+	github.com/go-kratos/kratos/v2 v2.7.3
 	github.com/go-sql-driver/mysql v1.8.0
 	github.com/google/wire v0.6.0
 	github.com/rabbitmq/amqp091-go v1.9.0
 	go.uber.org/automaxprocs v1.5.3
-	google.golang.org/genproto/googleapis/api v0.0.0-20240311173647-c811ad7063a7
+	google.golang.org/genproto/googleapis/api v0.0.0-20240325203815-454cdb8f5daa
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )
@@ -45,6 +45,6 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.19.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240311173647-c811ad7063a7 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240325203815-454cdb8f5daa // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
